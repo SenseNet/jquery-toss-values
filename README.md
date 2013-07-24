@@ -118,8 +118,8 @@ $("#hello").enableValueValidation({
 Triggering validation from code
 -------------------------------
 
-Using the same logics as above, 
+Using the same logics as above, this code will immediately display all validation messages for your stuff.
 
 ```javascript
-$("#hello").enableValueValidation();
+$("#hello").validateValues();
 ```
