@@ -65,7 +65,7 @@ And how you can see the stuff:
 var result = $("#hello").tossValues();
 
 // Check if it's valid
-if (result.isOkay) {
+if (result.isOkay()) {
     console.log(result.obj);
     // result.obj will be like this: { FirstName: "John", LastName: "Smith", Age: 22 }
 }
