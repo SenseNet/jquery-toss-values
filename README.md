@@ -10,7 +10,7 @@ Basics
 
 You can toss values from a form into an object like this. We're annotating our inputs with `data-fieldname`.
 
-Here's a simple HTML form:
+Here's a sample HTML form:
 
 ```html
 <div id="hello">
@@ -37,9 +37,9 @@ Validation
 
 You can have your stuff validated too! We support the following:
 
-* Required fields
-* Field conversion via the `data-convert` attribute (which is `eval()`ed), if its string representation is the same as the raw value, then it's valid
-* Custom field validation via the `data-validate` attribute (which is `eval()`ed), if it returns false then the field is invalid
+* Required fields: annotate them with `data-compulsory="true"`
+* Field conversion: annotate with the `data-convert` attribute (which is `eval()`ed), if its string representation is the same as the raw value, then it's valid
+* Custom field validation: annotate with the `data-validate` attribute (which is `eval()`ed), if it returns false then the field is invalid
 * You can hook in **totally custom logic** if you use `data-interpret`, find out more about that in our example files
 
 The same `tossValues` function will tell you all about invalid or missing fields.
@@ -81,8 +81,8 @@ else {
 Automatic validation
 --------------------
 
-You can make us automatically validate your forms! We can display validation messages too.
-**Of course you can customize the validation messages.**
+You can make us automatically validate your things! We can display validation messages too.
+**Of course you can also customize them.**
 
 ```html
 <div id="hello">
