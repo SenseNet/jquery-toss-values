@@ -75,10 +75,15 @@
                     <span style="font-family: Monospace;">{ MyField: "Hello world!" }</span>
                 </li>
                 <li>
-                    <strong>Custom interpretation</strong><br />
+                    <strong>Field conversion</strong><br />
+                    Using the <em>data-convert</em> attribute you can specify a JavaScript function which converts your element into a desired format.
+                    This is useful for performing conversion between different primitive types.<br />
+                    <strong>Field is considered valid if String() returns the same result for the converted and the raw value.</strong>
+                </li>
+                <li>
+                    <strong>Completely custom interpretation</strong><br />
                     Using the <em>data-interpret</em> attribute you can specify a JavaScript function which determines how your element should be interpreted.
                     This is useful for performing conversion or plugging in a completely custom mechanism.<br />
-                    <br />
                     <span style="font-family: Monospace;">&lt;input type="text" data-fieldname="MyField" value="42" data-interpret="(function() { return Number($(this).val()); })" /&gt;</span>
                     <br />
                     <br />
@@ -87,8 +92,8 @@
                     <span style="font-family: Monospace;">{ MyField: 42 }</span>
                     <br />
                     <br />
-                    In case of a <strong>completely custom mechanism</strong>, you can make your function return an object with the <em>rawValue</em>, <em>convertedValue</em>, <em>isMissing</em> and <em>isInvalid</em> properties.
-                    In this case, you will bypass the built-in validation completely.
+                    In case of a <strong>completely custom mechanism</strong>, you can make your function return an object with the <em>rawValue</em>, <em>convertedValue</em>, <em>isMissing</em> and <em>isInvalid</em> properties.<br />
+                    <strong>In this case, you will bypass the built-in validation completely.</strong>
                 </li>
             </ul>
             <h2>Example</h2>
@@ -106,6 +111,10 @@
                     <option value="1">Female</option>
                     <option value="2">Male</option>
                 </select>
+                <br />
+                
+                <span>Age</span>
+                <input type="text" data-fieldname="Age" data-compulsory="true" data-convert="Number" value="22" />
                 <br />
 
                 <input type="checkbox" data-fieldname="LivesAlone" />
@@ -134,7 +143,7 @@
                 <br />
                 <input type="radio" data-fieldname="RelationshipStatus" value="in a relationship" /><span>In a relationship</span>
                 <br />
-                
+
                 <br />
                 <br />
                 <pre class="result" style="font-family: monospace; font-size: 150%"></pre>
@@ -152,6 +161,9 @@
 
                 if (result.isOkay()) {
                     $("#tossvalues-1 .result").text(JSON.stringify(result.obj, null, 2));
+                }
+                else {
+                    alert("Some fields are invalid, fix them!");
                 }
             });
         });
