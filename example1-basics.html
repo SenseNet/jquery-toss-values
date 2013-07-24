@@ -1,0 +1,160 @@
+<!doctype html>
+<html>
+<head>
+    <title>jQuery tossValues plugin</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="jquery.tossValues.js"></script>
+    <style type="text/css">
+        .form-example span {
+            display: inline-block;
+            min-width: 100px;
+        }
+        li {
+            padding: 10px 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to jQuery.tossValues</h1>
+    <p>
+        Below is an example usage of the tossValues plugin.
+        <br />
+        You can use it like this:
+        <br />
+        <span style="font-family: Monospace;">var result = $('selector').tossValues();<br />console.log(result.obj);</span>
+    </p>
+    <div id="tossvalues-example">
+        <div>
+            <h2>Basics - tossValues</h2>
+            <p>
+                Use this method to get a JavaScript object from an HTML form. Supported are the following:
+            </p>
+            <ul>
+                <li>
+                    <strong>Text inputs, text areas</strong><br />
+                    Use the <em>data-fieldname</em> attribute to specifiy a field name. The field value will be added as a property to the JSON object.
+                    <br />
+                    <span style="font-family: Monospace;">&lt;input type="text" data-fieldname="MyField" value="Hello" /&gt;</span>
+                    <br />
+                    <br />
+                    Result:
+                    <br />
+                    <span style="font-family: Monospace;">{ MyField: "Hello" }</span>
+                </li>
+                <li>
+                    <strong>Check box, radio button groups</strong><br />
+                    Use the <em>data-fieldname</em> attribute to specifiy a field name.
+                    If you want multiple values to be persisted, use <em>data-createarray="true"</em>,
+                    in this case all the values will be added to an array.
+                    <br />
+                    <span style="font-family: Monospace;">
+                        &lt;input type="checkbox" data-fieldname="MyField" value="Choice1" checked="checked" data-createarray="true" /&gt;<br />
+                        &lt;input type="checkbox" data-fieldname="MyField" value="Choice2" checked="checked" data-createarray="true" /&gt;<br />
+                        &lt;input type="checkbox" data-fieldname="MyField" value="Choice3" data-createarray="true" /&gt;
+                    </span>
+                    <br />
+                    <br />
+                    Result:
+                    <br />
+                    <span style="font-family: Monospace;">{ MyField: [ "Choice1", "Choice2" ] }</span>
+
+                </li>
+                <li>
+                    <strong>Other elements</strong><br />
+                    You can work with any element that has the <em>data-fieldname</em> attribute. If it's not an input element, its <em>html()</em> value is used.
+                    <br />
+                    <span style="font-family: Monospace;">
+                        &lt;div data-fieldname="MyField"&gt;<br />
+                        &nbsp;&nbsp;Hello world!<br />
+                        &lt;/div&gt;
+                    </span>
+                    <br />
+                    <br />
+                    Result:
+                    <br />
+                    <span style="font-family: Monospace;">{ MyField: "Hello world!" }</span>
+                </li>
+                <li>
+                    <strong>Custom interpretation</strong><br />
+                    Using the <em>data-interpret</em> attribute you can specify a JavaScript function which determines how your element should be interpreted.
+                    This is useful for performing conversion or plugging in a completely custom mechanism.<br />
+                    <br />
+                    <span style="font-family: Monospace;">&lt;input type="text" data-fieldname="MyField" value="42" data-interpret="(function() { return Number($(this).val()); })" /&gt;</span>
+                    <br />
+                    <br />
+                    Result:
+                    <br />
+                    <span style="font-family: Monospace;">{ MyField: 42 }</span>
+                    <br />
+                    <br />
+                    In case of a <strong>completely custom mechanism</strong>, you can make your function return an object with the <em>rawValue</em>, <em>convertedValue</em>, <em>isMissing</em> and <em>isInvalid</em> properties.
+                    In this case, you will bypass the built-in validation completely.
+                </li>
+            </ul>
+            <h2>Example</h2>
+            <div id="tossvalues-1" class="form-example">
+                <span>First name</span>
+                <input type="text" data-fieldname="FirstName" value="John" />
+                <br />
+
+                <span>Last name</span>
+                <input type="text" data-fieldname="LastName" value="Smith" />
+                <br />
+
+                <span>Gender</span>
+                <select data-fieldname="Gender" data-interpret="(function() { return Number($(this).val()); })">
+                    <option value="1">Female</option>
+                    <option value="2">Male</option>
+                </select>
+                <br />
+
+                <input type="checkbox" data-fieldname="LivesAlone" />
+                <span>Do you live alone?</span>
+                <br />
+
+                <br />
+                
+                <input type="checkbox" data-fieldname="Things" name="Things" value="washing machine" data-createarray="true" />
+                <span>Do you have a washing machine?</span>
+                <br />
+                <input type="checkbox" data-fieldname="Things" name="Things" value="computer" data-createarray="true" />
+                <span>Do you have a computer?</span>
+                <br />
+                <input type="checkbox" data-fieldname="Things" name="Things" value="fridge" data-createarray="true" />
+                <span>Do you have a fridge?</span>
+                <br />
+
+                <br />
+
+                <span>Relationship status</span>
+                <br />
+                <input type="radio" data-fieldname="RelationshipStatus" value="single" /><span>Single</span>
+                <br />
+                <input type="radio" data-fieldname="RelationshipStatus" value="married" /><span>Married</span>
+                <br />
+                <input type="radio" data-fieldname="RelationshipStatus" value="in a relationship" /><span>In a relationship</span>
+                <br />
+                
+                <br />
+                <br />
+                <pre class="result" style="font-family: monospace; font-size: 150%"></pre>
+                <br />
+                <button id="tossvalues-result-1">Get results!</button>
+            </div>
+        </div>
+        
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            $("#tossvalues-result-1").on("click", function (e) {
+                var result = $("#tossvalues-1").tossValues();
+                console.log(result);
+
+                if (result.isOkay()) {
+                    $("#tossvalues-1 .result").text(JSON.stringify(result.obj, null, 2));
+                }
+            });
+        });
+    </script>
+</body>
+</html>
