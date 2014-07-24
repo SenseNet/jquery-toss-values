@@ -32,6 +32,30 @@ console.log(result.obj);
 
 See **example1-basics.html** for detailed explanation.
 
+Filling values
+--------------
+
+In some cases, you need to not only toss values out of the DOM, but shove things back into it.
+For this purpose, we have the `fillValues()` method for you.
+
+For the above example, you could do the following:
+
+```javascript
+var obj = { FirstName: "Joe", LastName: "Shepherd" };
+$("#hello").fillValues({ obj: obj });
+```
+
+How does it work?
+
+It tries to make a "smart best guess" on how to fill the control with the given value. Consult with the source code for more details.
+
+### Customizing fill values
+
+You can specify an attribute called `data-customfill`. This is `eval`ed and should be a JavaScript function.
+When `fillValues()` encounters such a field, it will call this function with the following parameters: *the control to fill*, *the value to fill it with*.
+
+NOTE: if you have a field which has a `data-interpret` attribute, you **must** also specify `data-customfill` if you want to fill it!
+
 Validation
 ----------
 
@@ -78,8 +102,7 @@ else {
 }
 ```
 
-Automatic validation
---------------------
+### Automatic validation
 
 You can make us automatically validate your things! We can display validation messages too.
 **Of course you can also customize them.**
@@ -106,6 +129,8 @@ This will make the plugin automatically validate your things when they change. T
 $("#hello").enableValueValidation();
 ```
 
+### Customizing validation
+
 Customize your validation messages like this:
 
 ```javascript
@@ -115,8 +140,7 @@ $("#hello").enableValueValidation({
 });
 ```
 
-Triggering validation from code
--------------------------------
+### Triggering validation from code
 
 Using the same logics as above, this code will immediately display all validation messages for your stuff.
 

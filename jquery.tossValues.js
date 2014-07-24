@@ -34,14 +34,15 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
     // The default options for the functions in this module
     var defaultOptions = {
-        compulsoryMessage: "Required",
-        invalidFormatMessage: "Invalid",
+        compulsoryMessage: "Field is required",
+        invalidFormatMessage: "Invalid field",
         fieldNameAttr: "data-fieldname",
         convertAttr: "data-convert",
         compulsoryAttr: "data-compulsory",
         validatorOfAttr: "data-validated-fieldname",
         createArrayAttr: "data-createarray",
         interpretValueAttr: "data-interpret",
+        customFillValueAttr: "data-customfill",
         validateValueAttr: "data-validate",
         customInvalidFormatMessageAttr: "data-invalidformatmessage"
     };
@@ -227,6 +228,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         // For each element which represents a field, get its value and perform validation
         $("[" + options.fieldNameAttr + "]", $context).each(function () {
             var $this = $(this);
+
             var key = $this.attr(options.fieldNameAttr);
             var v = interpretElement.call(this, options, $context);
 
@@ -236,7 +238,6 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             if (v.isMissing) {
                 result.missingFields.push(key);
             }
-
             if ($this.attr(options.createArrayAttr) == "true") {
                 if (!result.obj[key]) {
                     result.obj[key] = [];
@@ -304,7 +305,22 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                     var theValue = options.obj[prop];
                     $control.data("originalValue", theValue);
 
-                    if ($control.is("input[type=checkbox], input[type=radio]")) {
+                    var customFill = null;
+                    try {
+                        customFill = eval($control.attr(options.customFillValueAttr));
+                    }
+                    catch (err) {
+                        console.log("Trouble when evaling:", $control, options.customFillValueAttr, err);
+                    }
+
+                    if (typeof (customFill) === "function") {
+                        customFill.call($control, theValue);
+                    }
+                    else if ($control.attr(options.interpretValueAttr)) {
+                        // This element has custom interpretation which means we can't fill its value here
+                        console.log("Can't fill value for field because the control has custom interpret value attribute.", $control, prop);
+                    }
+                    else if ($control.is("input[type=checkbox], input[type=radio]")) {
                         // Check box and radio button
                         if (typeof (theValue) === "boolean") {
                             // Boolean value - just check the box if true
@@ -324,13 +340,13 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                         if (theValue && theValue.constructor === Array) {
                             $control.val(theValue[0]);
                         }
+                        else if (theValue && theValue.constructor === Number) {
+                            $control.val(theValue.toString());
+                        }
                         else {
                             $control.val(theValue);
                         }
                         // TODO: take care of multiple selects?
-                    }
-                    else if ($control.attr(options.interpretValueAttr)) {
-                        // This element has custom interpretation which means we can't fill its value here
                     }
                     else {
                         // Other kinds of elements
