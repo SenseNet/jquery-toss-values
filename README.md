@@ -44,22 +44,6 @@ The returned result object has a bunch of handy features.
 * `result.fieldToFocus` contains the jQuery object of the first errored field
 * `result.focusInvalidField()` is a function that will call `focus()` on `result.fieldToFocus` if it's not null - it's automatically called if you specify `autoFocusErroredField` for the options
 
-### Options and their defaults
-
-The options that you give to all our methods (`tossValues()`, `fillValues()`, `validateValues()`, `enableValueValidation()`) have defaults.
-You can override these defaults by specifying them in the options of any of those methods.
-
-However, if you want to use the same default settings throughout your project without specifying them in all your calls, there is a handy way to do it:
-
-For example:
-
-```javascript
-$.tossValues.setDefaultOptions({
-    compulsoryMessage: "Totally fill this field!",
-    invalidFormatMessage: "This field is very invalid!"
-});
-```
-
 Filling values
 --------------
 
@@ -175,3 +159,34 @@ Using the same logics as above, this code will immediately display all validatio
 ```javascript
 $("#hello").validateValues();
 ```
+
+Other customizations
+--------------------
+
+### Options and their defaults
+
+The options that you give to all our methods (`tossValues()`, `fillValues()`, `validateValues()`, `enableValueValidation()`) have defaults.
+You can override these defaults by specifying them in the options of any of those methods.
+
+However, if you want to use the same default settings throughout your project without specifying them in all your calls, there is a handy way to do it:
+
+For example:
+
+```javascript
+$.tossValues.setDefaultOptions({
+    compulsoryMessage: "Totally fill this field!",
+    invalidFormatMessage: "This field is very invalid!"
+});
+```
+
+### Errors and console.log
+
+By default, this plugin will log all errors in the console.
+However, you might want to disable this behavior in some cases.
+
+Just do this to disable:
+
+```javascript
+$.tossValues.consoleLogEnabled = false;
+```
+

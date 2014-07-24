@@ -52,6 +52,13 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         dontSaveAttr: "data-dontsave"
     };
 
+    // custom console log function that can be enabled and disabled
+    var consolelog = function () {
+        if ($.tossValues.consoleLogEnabled) {
+            console.log.apply(console, arguments);
+        }
+    };
+
     // Converts a field to the specified type
     var convertField = function (rawValue, converter) {
         var convertedValue = rawValue;
@@ -63,7 +70,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 }
             }
             catch (err) {
-                console.log(err);
+                consoleLog(err);
                 convertedValue = null;
             }
         }
@@ -131,7 +138,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 }
             }
             catch (err) {
-                console.log(err);
+                consoleLog(err);
             }
         }
         if (v === null) {
@@ -169,7 +176,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 v.isInvalid = !validatorFunction.call($this, v.convertedValue);
             }
             catch (err) {
-                console.log(err);
+                consoleLog(err);
                 v.isInvalid = true;
             }
         }
@@ -348,7 +355,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                         customFill = eval("0, " + /* <-- IE8 fix */ $control.attr(options.customFillValueAttr));
                     }
                     catch (err) {
-                        console.log("Trouble when evaling:", $control, options.customFillValueAttr, err);
+                        consoleLog("Trouble when evaling:", $control, options.customFillValueAttr, err);
                     }
 
                     if (typeof (customFill) === "function") {
@@ -356,7 +363,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                     }
                     else if ($control.attr(options.interpretValueAttr)) {
                         // This element has custom interpretation which means we can't fill its value here
-                        console.log("Can't fill value for field because the control has custom interpret value attribute.", $control, prop);
+                        consoleLog("Can't fill value for field because the control has custom interpret value attribute.", $control, prop);
                     }
                     else if ($control.is("input[type=checkbox], input[type=radio]")) {
                         // Check box and radio button
@@ -402,7 +409,11 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         }
     };
 
+    // Global object for user-configurable settings
     $.tossValues = $.tossValues || {};
+
+    // Specifies if console logging is enabled
+    $.tossValues.consoleLogEnabled = true;
 
     // Provides a way to customize the default options
     $.tossValues.setDefaultOptions = function (newDefaultOptions) {
