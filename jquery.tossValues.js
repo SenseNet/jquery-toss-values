@@ -57,7 +57,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         var convertedValue = rawValue;
         if (convertedValue && converter) {
             try {
-                var conversionFunction = eval(converter);
+                var conversionFunction = eval("0, " + /* <-- IE8 fix */ converter);
                 if (typeof (conversionFunction) === "function") {
                     convertedValue = conversionFunction(rawValue);
                 }
@@ -112,7 +112,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         if ($this.attr(options.interpretValueAttr)) {
             try {
                 // Eval the contents of the attribute
-                var customInterpretValue = eval($this.attr(options.interpretValueAttr));
+                var customInterpretValue = eval("0, " + /* <-- IE8 fix */ $this.attr(options.interpretValueAttr));
                 // If the result is a function, execute it
                 if (typeof (customInterpretValue) === "function") {
                     v = customInterpretValue.call($this, $context);
@@ -165,7 +165,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         if ($this.attr(options.validateValueAttr)) {
             // Execute custom validator function, if there is one
             try {
-                var validatorFunction = eval($this.attr(options.validateValueAttr));
+                var validatorFunction = eval("0, " + /* <-- IE8 fix */ $this.attr(options.validateValueAttr));
                 v.isInvalid = !validatorFunction.call($this, v.convertedValue);
             }
             catch (err) {
@@ -345,7 +345,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
                     var customFill = null;
                     try {
-                        customFill = eval($control.attr(options.customFillValueAttr));
+                        customFill = eval("0, " + /* <-- IE8 fix */ $control.attr(options.customFillValueAttr));
                     }
                     catch (err) {
                         console.log("Trouble when evaling:", $control, options.customFillValueAttr, err);
