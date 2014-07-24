@@ -34,8 +34,12 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
     // The default options for the functions in this module
     var defaultOptions = {
+        // Parameters
         compulsoryMessage: "Field is required",
         invalidFormatMessage: "Invalid field",
+        autoFocusErroredField: false,
+
+        // Customizable attribute names
         fieldNameAttr: "data-fieldname",
         convertAttr: "data-convert",
         compulsoryAttr: "data-compulsory",
@@ -44,7 +48,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         interpretValueAttr: "data-interpret",
         customFillValueAttr: "data-customfill",
         validateValueAttr: "data-validate",
-        customInvalidFormatMessageAttr: "data-invalidformatmessage"
+        customInvalidFormatMessageAttr: "data-invalidformatmessage",
+        dontSaveAttr: "data-dontsave"
     };
 
     // Converts a field to the specified type
@@ -209,6 +214,12 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         return !this.invalidFields.length && !this.missingFields.length;
     };
 
+    var focusInvalidField = function () {
+        if (this.fieldToFocus) {
+            this.fieldToFocus.focus();
+        }
+    };
+
     // Tosses values from elements with the specified attribute within the specified context into an object.
     $.fn.tossValues = function (options) {
         // Options
@@ -219,7 +230,10 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             obj: {},
             invalidFields: [],
             missingFields: [],
-            isOkay: isOkay
+            isOkay: isOkay,
+            onlyOneError: false,
+            fieldToFocus: null,
+            focusInvalidField: focusInvalidField
         };
 
         // Save the value of this (to be used in a closure)
@@ -229,14 +243,34 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         $("[" + options.fieldNameAttr + "]", $context).each(function () {
             var $this = $(this);
 
+            // If we don't want to save this field, then don't
+            if ($this.attr(options.dontSaveAttr))
+                return;
+
             var key = $this.attr(options.fieldNameAttr);
             var v = interpretElement.call(this, options, $context);
 
+            // Check if the field is invalid
             if (v.isInvalid) {
                 result.invalidFields.push(key);
+                if (!result.fieldToFocus) {
+                    result.onlyOneError = true;
+                    result.fieldToFocus = $this;
+                }
+                else {
+                    result.onlyOneError = false;
+                }
             }
+            // Check if the field is missing
             if (v.isMissing) {
                 result.missingFields.push(key);
+                if (!result.fieldToFocus) {
+                    result.onlyOneError = true;
+                    result.fieldToFocus = $this;
+                }
+                else {
+                    result.onlyOneError = false;
+                }
             }
             if ($this.attr(options.createArrayAttr) == "true") {
                 if (!result.obj[key]) {
@@ -250,6 +284,10 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 result.obj[key] = v.convertedValue;
             }
         });
+
+        // If specified, focus the errored field
+        if (options.autoFocusErroredField)
+            result.focusInvalidField();
 
         return result;
     };

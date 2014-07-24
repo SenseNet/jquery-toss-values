@@ -32,6 +32,18 @@ console.log(result.obj);
 
 See **example1-basics.html** for detailed explanation.
 
+### The result object
+
+The returned result object has a bunch of handy features.
+
+* `result.obj` contains the resulting JavaScript object filled with values from the DOM
+* `result.invalidFields` is an array that contains the names of invalid fields
+* `result.missingFields` is an array that contains the names of missing compulsory fields
+* `result.isOkay()` is a function that you can call to see if there are no errors
+* `result.onlyOneError` is a boolean that returns true if there is only one errored field (you can use this to provide customized singular error messages)
+* `result.fieldToFocus` contains the jQuery object of the first errored field
+* `result.focusInvalidField()` is a function that will call `focus()` on `result.fieldToFocus` if it's not null - it's automatically called if you specify `autoFocusErroredField` for the options
+
 Filling values
 --------------
 
