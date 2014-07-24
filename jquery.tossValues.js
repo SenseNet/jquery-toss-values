@@ -402,4 +402,11 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         }
     };
 
+    $.tossValues = $.tossValues || {};
+
+    // Provides a way to customize the default options
+    $.tossValues.setDefaultOptions = function (newDefaultOptions) {
+        defaultOptions = $.extend({}, defaultOptions, newDefaultOptions);
+    };
+
 })(jQuery);
