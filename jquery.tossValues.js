@@ -412,8 +412,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     // Global object for user-configurable settings
     $.tossValues = $.tossValues || {};
 
-    // Specifies if console logging is enabled
-    $.tossValues.consoleLogEnabled = true;
+    // Specifies if console logging is enabled (turn off when there is no console or console.log)
+    $.tossValues.consoleLogEnabled = typeof(console) !== "undefined" && typeof(console.log) === "function";
 
     // Provides a way to customize the default options
     $.tossValues.setDefaultOptions = function (newDefaultOptions) {
