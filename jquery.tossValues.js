@@ -30,7 +30,7 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function ($) {
+(function ($, undefined) {
 
     // The default options for the functions in this module
     var defaultOptions = {
@@ -53,7 +53,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     };
 
     // custom console log function that can be enabled and disabled
-    var consolelog = function () {
+    var consoleLog = function () {
         if ($.tossValues.consoleLogEnabled) {
             console.log.apply(console, arguments);
         }
@@ -113,7 +113,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     // Output: { rawValue: ..., convertedValue: ..., isMissing: ..., isInvalid: ...  }
     var interpretElement = function (options, $context) {
         var $this = $(this);
-        var v = null;
+        var v;
+        var usedCustomInterpret = false;
 
         // Check if the element has a custom interpret value attribute
         if ($this.attr(options.interpretValueAttr)) {
@@ -123,9 +124,10 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 // If the result is a function, execute it
                 if (typeof (customInterpretValue) === "function") {
                     v = customInterpretValue.call($this, $context);
+                    usedCustomInterpret = true;
 
                     // Put the resulting object into the correct format
-                    if (typeof (v) !== "object" || (typeof (v.convertedValue) === "undefined" && typeof (v.rawValue) === "undefined"))
+                    if (v === null || typeof (v) !== "object" || (typeof (v.convertedValue) === "undefined" && typeof (v.rawValue) === "undefined"))
                         v = { rawValue: v, convertedValue: v };
                     else if (typeof (v.convertedValue) !== "undefined" && typeof (v.rawValue) === "undefined")
                         v = { rawValue: v.convertedValue, convertedValue: v.convertedValue };
@@ -141,7 +143,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 consoleLog(err);
             }
         }
-        if (v === null) {
+        if (!usedCustomInterpret) {
             v = getValueFromElement(options, $this, $context);
         }
 
@@ -257,17 +259,6 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             var key = $this.attr(options.fieldNameAttr);
             var v = interpretElement.call(this, options, $context);
 
-            // Check if the field is invalid
-            if (v.isInvalid) {
-                result.invalidFields.push(key);
-                if (!result.fieldToFocus) {
-                    result.onlyOneError = true;
-                    result.fieldToFocus = $this;
-                }
-                else {
-                    result.onlyOneError = false;
-                }
-            }
             // Check if the field is missing
             if (v.isMissing) {
                 result.missingFields.push(key);
@@ -279,6 +270,19 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                     result.onlyOneError = false;
                 }
             }
+            // Check if the field is invalid (if it's missing we don't care)
+            else if (v.isInvalid) {
+                result.invalidFields.push(key);
+                if (!result.fieldToFocus) {
+                    result.onlyOneError = true;
+                    result.fieldToFocus = $this;
+                }
+                else {
+                    result.onlyOneError = false;
+                }
+            }
+
+            // Array creation magic
             if ($this.attr(options.createArrayAttr) == "true") {
                 if (!result.obj[key]) {
                     result.obj[key] = [];
@@ -413,7 +417,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     $.tossValues = $.tossValues || {};
 
     // Specifies if console logging is enabled (turn off when there is no console or console.log)
-    $.tossValues.consoleLogEnabled = typeof(console) !== "undefined" && typeof(console.log) === "function";
+    $.tossValues.consoleLogEnabled = typeof (console) !== "undefined" && typeof (console.log) === "function";
 
     // Provides a way to customize the default options
     $.tossValues.setDefaultOptions = function (newDefaultOptions) {
