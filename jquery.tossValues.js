@@ -38,6 +38,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         compulsoryMessage: "Field is required",
         invalidFormatMessage: "Invalid field",
         autoFocusErroredField: false,
+        autoValidationOnKeyup: true,
 
         // Customizable attribute names
         fieldNameAttr: "data-fieldname",
@@ -330,9 +331,15 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         // Hook up event handlers to each element's change event
         $("[" + options.fieldNameAttr + "]", this).each(function () {
             var $this = $(this);
-            $this.on("change.tossvalues", function () {
+            var validationFunc = function () {
                 showValidationMessage.call(this, options, $context);
-            });
+            };
+
+            $this.on("change.tossvalues", validationFunc);
+
+            if ($this.is("input[type=text], input[type=password], textarea") && options.autoValidationOnKeyup) {
+                $this.on("keyup.tossvalues", validationFunc);
+            }
         });
 
         // Return this (for chainability)
