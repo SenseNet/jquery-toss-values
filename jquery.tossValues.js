@@ -39,6 +39,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         invalidFormatMessage: "Invalid field",
         autoFocusErroredField: false,
         autoValidationOnKeyup: true,
+        aspNetMvcCompatible: true,
 
         // Customizable attribute names
         fieldNameAttr: "data-fieldname",
@@ -84,8 +85,16 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         var convertedValue = null;
 
         if ($e.is("input[type=radio],input[type=checkbox]")) {
-            // If the element is a radio button or checkbox, return its value only if selected, otherwise null
-            rawValue = $e.attr("value") ? ($e.is(":checked") ? $e.val() : null) : $e.is(":checked");
+            // If the element is a radio button or checkbox
+            var valueAttr = $e.attr("value");
+
+            // When it doesn't have a special value: return whether it's checked or not
+            // NOTE: ASP.NET MVC's HTML helper generates value="true" for check boxes
+            if (!valueAttr || (options.aspNetMvcCompatible && valueAttr === "true" && $e.is("[data-val]")))
+                rawValue = $e.is(":checked");
+            // When it has a special value: return its value if checked, otherwise null
+            else
+                rawValue = $e.is(":checked") ? $e.val() : null;
         }
         else if ($e.is("input,textarea,select")) {
             // For other input fields, this returns their value
