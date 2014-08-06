@@ -125,6 +125,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         var $this = $(this);
         var v;
         var usedCustomInterpret = false;
+        var isCompulsory = $this.attr(options.compulsoryAttr) === "true";
 
         // Check if the element has a custom interpret value attribute
         if ($this.attr(options.interpretValueAttr)) {
@@ -144,6 +145,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                     else if (typeof (v.convertedValue) === "undefined" && typeof (v.rawValue) !== "undefined")
                         v = { rawValue: v.rawValue, convertedValue: v.rawValue };
 
+                    v.isMissing = v.isMissing && isCompulsory;
+
                     if (typeof (v.isMissing) !== "undefined" && typeof (v.isInvalid) !== "undefined") {
                         return v;
                     }
@@ -161,7 +164,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         v.isInvalid = false;
 
         // Check if it's compulsory
-        if ($this.attr(options.compulsoryAttr) === "true") {
+        if (isCompulsory) {
             // If this is a checkbox or a radio group which has a group (name attribute), one of them must be checked.
             if ($this.is("input[type=checkbox],input[type=radio]") && $this.attr("name")) {
                 var $others = $('input[type="' + $this.attr("type") + '"][name="' + $this.attr("name") + '"]', $context);
