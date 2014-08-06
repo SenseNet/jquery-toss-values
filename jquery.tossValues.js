@@ -51,7 +51,10 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         customFillValueAttr: "data-customfill",
         validateValueAttr: "data-validate",
         customInvalidFormatMessageAttr: "data-invalidformatmessage",
-        dontSaveAttr: "data-dontsave"
+        dontSaveAttr: "data-dontsave",
+
+        // Customizable jQuery data keys
+        validationRulesKey: "tossvalues-validation-rules"
     };
 
     // custom console log function that can be enabled and disabled
@@ -119,6 +122,33 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         };
     };
 
+    // Checks validation rules on an element
+    var checkValidationRules = function (options, validation) {
+        // Look at this
+        var $this = $(this);
+
+        // Get rules
+        var rules = $this.data(options.validationRulesKey);
+
+        // If there are no rules, we're okay
+        if (!rules)
+            return;
+
+        // Go through all rules
+        for (var i = 0; i < rules.length; i++) {
+            var result = rules[i].call($this);
+            // No result or true means validation is OK
+            if (typeof (result) === "undefined" || result === true)
+                continue;
+
+            // Otherwise we have an error
+            validation.isInvalid = true;
+            if (typeof (result) === "string")
+                validation.errorMessage = result;
+            return;
+        }
+    };
+
     // Interprets the value of an element and performs the default validation on it
     // Output: { rawValue: ..., convertedValue: ..., isMissing: ..., isInvalid: ...  }
     var interpretElement = function (options, $context) {
@@ -145,9 +175,13 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                     else if (typeof (v.convertedValue) === "undefined" && typeof (v.rawValue) !== "undefined")
                         v = { rawValue: v.rawValue, convertedValue: v.rawValue };
 
-                    v.isMissing = v.isMissing && isCompulsory;
-
+                    // If the result is fully interpreted (it has isMissing and isInvalid properties), we can finalize and return it
                     if (typeof (v.isMissing) !== "undefined" && typeof (v.isInvalid) !== "undefined") {
+                        // Only compulsory fields can be missing
+                        v.isMissing = v.isMissing && isCompulsory;
+
+                        // Check validation rules
+                        checkValidationRules.call($this, options, v);
                         return v;
                     }
                 }
@@ -204,6 +238,9 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             }
         }
 
+        // Check validation rules
+        checkValidationRules.call($this, options, v);
+
         return v;
     };
 
@@ -215,15 +252,21 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         var validation = interpretElement.call(this, options, $context);
         var validationMessage = "";
 
-        // Check if it's compulsory
-        if (validation.isMissing) {
-            validationMessage += " " + options.compulsoryMessage;
+        if (validation.errorMessage) {
+            validationMessage += " " + validation.errorMessage;
+        }
+        else {
+            // Check if it's compulsory
+            if (validation.isMissing) {
+                validationMessage += " " + options.compulsoryMessage;
+            }
+
+            // Check if its format is valid
+            if (validation.isInvalid) {
+                validationMessage += " " + ($this.attr(options.customInvalidFormatMessageAttr) || options.invalidFormatMessage);
+            }
         }
 
-        // Check if its format is valid
-        if (validation.isInvalid) {
-            validationMessage += " " + ($this.attr(options.customInvalidFormatMessageAttr) || options.invalidFormatMessage);
-        }
 
         // Toggle visibility of the validation label
         $validationLabel.html(validationMessage);
@@ -327,6 +370,31 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         $("[" + options.fieldNameAttr + "]", this).each(function () {
             showValidationMessage.call(this, options, $context);
         });
+
+        // Return this (for chainability)
+        return this;
+    };
+
+    // Adds a programmatic validation rule to an element
+    $.fn.addValidationRule = function (func, options) {
+        // Options
+        options = $.extend({}, defaultOptions, options);
+
+        // Remember this (to be able to use it in a closure)
+        var $context = this;
+        
+        // Check parameters
+        if (!func || typeof(func) !== "function")
+            $.error("addValidationRule: first parameter must be a function");
+
+        // Get rules
+        var rules = $context.data(options.validationRulesKey) || [];
+        if (typeof (rules.push) !== "function")
+            rules = [];
+
+        // Save
+        rules.push(func);
+        $context.data(options.validationRulesKey, rules);
 
         // Return this (for chainability)
         return this;

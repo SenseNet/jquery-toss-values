@@ -114,6 +114,29 @@ else {
 }
 ```
 
+### Programmatic validation rules
+
+It is possible to add a programmatic validation rule with custom error messages.
+
+```javascript
+$("[data-fieldname=Name]").addValidationRule(function () {
+    var $this = $(this);
+    if ($this.val() === "Elvis Presley")
+        return "No, you are definitely not Elvis.";
+});
+```
+
+The `addValidationRule()` call takes a function as a first argument and the usual `options` as the second.
+
+About the supplied function:
+
+* Gets the validated element as `this`
+* Should return `true` or nothing (`undefined`) if the element is valid
+* Should return `false` if the element is invalid and you wish to show the generic error message
+* Should return a string if the element is invalid and you wish to show a custom error message
+
+You can add multiple validation rules to the same element.
+
 ### Automatic validation
 
 You can make us automatically validate your things! We can display validation messages too.
