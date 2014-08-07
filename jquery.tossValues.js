@@ -439,6 +439,11 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 $("[" + options.fieldNameAttr + "=\"" + prop + "\"]", $context).each(function () {
                     var $control = $(this);
                     var theValue = options.obj[prop];
+
+                    // Ignore non-existent controls and null values
+                    if ($control.length === 0 || theValue === null || typeof(theValue) === "undefined")
+                        return;
+
                     $control.data("originalValue", theValue);
 
                     var customFill = null;
@@ -498,6 +503,9 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 });
             }
         }
+
+        // Return this (for chainability)
+        return this;
     };
 
     // Global object for user-configurable settings
