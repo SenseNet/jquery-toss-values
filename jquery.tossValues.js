@@ -409,10 +409,15 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         var $context = this;
 
         // Hook up event handlers to each element's change event
-        $("[" + options.fieldNameAttr + "]", this).each(function () {
+        var $controls = $("[" + options.fieldNameAttr + "]", this);
+        $controls.each(function () {
             var $this = $(this);
             var validationFunc = function () {
-                showValidationMessage.call(this, options, $context);
+                // Always validate every control
+                // NOTE: this is needed because validation results can depend on each other
+                $controls.each(function () {
+                    showValidationMessage.call($(this), options, $context);
+                })
             };
 
             $this.on("change.tossvalues", validationFunc);
