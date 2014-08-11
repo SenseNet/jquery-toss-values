@@ -440,8 +440,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                     var $control = $(this);
                     var theValue = options.obj[prop];
 
-                    // Ignore non-existent controls and null values
-                    if ($control.length === 0 || theValue === null || typeof(theValue) === "undefined")
+                    // Ignore non-existent controls
+                    if ($control.length === 0)
                         return;
 
                     $control.data("originalValue", theValue);
@@ -467,7 +467,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                             // Boolean value - just check the box if true
                             $control.prop("checked", theValue);
                         }
-                        else if (theValue.constructor === Array) {
+                        else if (theValue && theValue.constructor === Array) {
                             // Array value- check the box if the array contains its value
                             $control.prop("checked", theValue.indexOf($control.attr("value")) >= 0);
                         }
@@ -491,8 +491,11 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                     }
                     else {
                         // Other kinds of elements
-                        if (theValue.constructor === Array) {
+                        if (theValue && theValue.constructor === Array) {
                             $control.html(theValue[0]);
+                        }
+                        else if (theValue && theValue.constructor === Number) {
+                            $control.html(theValue.toString());
                         }
                         else {
                             $control.html(theValue);
