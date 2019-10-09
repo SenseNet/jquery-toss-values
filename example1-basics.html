@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
     <title>jQuery tossValues plugin</title>
@@ -155,7 +155,9 @@
     </div>
     <script type="text/javascript">
         $(function () {
+
             $("#tossvalues-result-1").on("click", function (e) {
+                
                 var result = $("#tossvalues-1").tossValues();
                 console.log(result);
 
@@ -165,7 +167,9 @@
                 else {
                     alert("Some fields are invalid, fix them!");
                 }
+
             });
+
         });
     </script>
 </body>
